@@ -3,13 +3,60 @@
   "version": "0.0.1",
   "description": "A library for simplyfing the use of redux-thunk with REST APIs",
   "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mitodl/redux-hammock"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha --require babel-polyfill --compilers js:babel-register src/*_test.js",
+    "watch": "mocha --watch --require babel-polyfill --compilers js:babel-register src/*_test.js",
+    "lint": "standard --env mocha",
+    "flow": "flow",
+    "fmt": "standard --env mocha --fix"
   },
   "keywords": [
     "redux",
     "REST"
   ],
   "author": "Alice Pote <alicep@mit.edu>",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "babel-polyfill": "^6.23.0",
+    "lodash": "^4.17.4",
+    "ramda": "^0.24.1",
+    "redux-actions": "^2.0.3"
+  },
+  "devDependencies": {
+    "babel-core": "^6.25.0",
+    "babel-eslint": "^7.2.3",
+    "babel-plugin-transform-object-rest-spread": "^6.23.0",
+    "babel-preset-env": "^1.5.2",
+    "babel-preset-flow": "^6.23.0",
+    "babel-register": "^6.24.1",
+    "chai": "^4.0.2",
+    "eslint-plugin-flowtype": "^2.34.0",
+    "flow-bin": "^0.47.0",
+    "mocha": "^3.4.2",
+    "redux-asserts": "^0.0.10",
+    "sinon": "^2.3.4",
+    "standard": "^10.0.2"
+  },
+  "babel": {
+    "presets": [
+      "flow",
+      "env"
+    ],
+    "plugins": [
+      "transform-object-rest-spread"
+    ]
+  },
+  "standard": {
+    "plugins": [
+      "flowtype"
+    ],
+    "parser": "babel-eslint",
+    "ignore": [
+      "flow_declarations.js"
+    ]
+  }
 }

@@ -1,7 +1,7 @@
 # Redux-Hammock
 
 [![Build
-Status](https://travis-ci.org/mitodl/redux-hammock.svg?branch=master)](https://travis-ci.org/mitodl/redux-hammock))
+Status](https://travis-ci.org/mitodl/redux-hammock.svg?branch=master)](https://travis-ci.org/mitodl/redux-hammock)
 
 Hammock is a library which allows you to abstract away some details and
 boilerplate when using redux and fetch with REST endpoints. You just write

@@ -1,7 +1,7 @@
 // @flow
 import R from 'ramda'
-import _ from 'lodash'
 import { createAction } from 'redux-actions'
+import merge from 'lodash.merge'
 
 import type { ActionType } from './reduxTypes'
 
@@ -18,5 +18,5 @@ export const withUsername = (type: ActionType, payloadFunc: Function = R.nthArg(
 )
 
 export const updateStateByUsername = (state: Object, username: string, update: Object) => (
-  _.merge({}, state, { [username]: update })
+  merge({}, state, { [username]: update })
 )

@@ -2,7 +2,7 @@
 /* global fetch */
 import { createAction } from 'redux-actions'
 import R from 'ramda'
-import _ from 'lodash'
+import snakeCase from 'lodash.snakecase'
 
 import type { Action, ActionType, Dispatcher } from './reduxTypes'
 import type { Endpoint } from './restTypes'
@@ -17,7 +17,7 @@ import {
 } from './constants'
 import { withUsername, updateStateByUsername } from './util'
 
-const actionize = R.compose(R.toUpper, R.join('_'), R.map(_.snakeCase))
+const actionize = R.compose(R.toUpper, R.join('_'), R.map(snakeCase))
 
 export const requestActionType = (...xs: string[]) => `REQUEST_${actionize(xs)}`
 
@@ -47,7 +47,12 @@ export function makeFetchFunc (endpoint: Endpoint, verb: string): (...args: any)
   let url = getUrl(endpoint, verb)
   let options = getMakeOptions(endpoint, verb)
   return (...args) => {
-    return fetch(_.isFunction(url) ? url(...args) : url, options(...args))
+    return fetch(
+      typeof url === 'function'
+      ? url(...args)
+      : url,
+      options(...args)
+    )
   }
 }
 

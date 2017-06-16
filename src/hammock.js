@@ -3,6 +3,7 @@
 import { createAction } from 'redux-actions'
 import R from 'ramda'
 import snakeCase from 'lodash.snakecase'
+import 'isomorphic-fetch'
 
 import type { Action, ActionType, Dispatcher } from './reduxTypes'
 import type { Endpoint } from './restTypes'
@@ -46,8 +47,9 @@ const getMakeOptions = (endpoint: Endpoint, verb: string) => (
 export function makeFetchFunc (endpoint: Endpoint, verb: string): (...args: any) => Promise<*> {
   let url = getUrl(endpoint, verb)
   let options = getMakeOptions(endpoint, verb)
+  let fetchImplementation = endpoint.fetchFunc || fetch
   return (...args) => {
-    return fetch(
+    return fetchImplementation(
       typeof url === 'function'
       ? url(...args)
       : url,

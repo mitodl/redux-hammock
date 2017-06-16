@@ -11,6 +11,7 @@
     "test": "mocha --require babel-polyfill --compilers js:babel-register src/*_test.js",
     "watch": "mocha --watch --require babel-polyfill --compilers js:babel-register src/*_test.js",
     "lint": "standard --env mocha",
+    "lint:verbose": "standard --env mocha --verbose",
     "flow": "flow",
     "fmt": "standard --env mocha --fix",
     "build": "rollup -c",
@@ -26,8 +27,10 @@
     "babel-polyfill": "^6.23.0",
     "lodash.merge": "^4.6.0",
     "lodash.snakecase": "^4.1.1",
+    "isomorphic-fetch": "^2.2.1",
     "ramda": "^0.24.1",
-    "redux-actions": "^2.0.3"
+    "redux-actions": "^2.0.3",
+    "sanctuary": "^0.13.2"
   },
   "devDependencies": {
     "babel-core": "^6.25.0",
@@ -38,8 +41,12 @@
     "babel-preset-flow": "^6.23.0",
     "babel-register": "^6.24.1",
     "chai": "^4.0.2",
+    "chai-as-promised": "^7.0.0",
     "eslint-plugin-flowtype": "^2.34.0",
+    "fetch-mock": "^5.11.0",
     "flow-bin": "^0.47.0",
+    "jsdom": "^11.0.0",
+    "jsdom-global": "^3.0.2",
     "mocha": "^3.4.2",
     "redux-asserts": "^0.0.10",
     "rollup": "^0.43.0",

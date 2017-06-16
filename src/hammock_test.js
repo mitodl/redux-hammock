@@ -2,6 +2,7 @@ import { assert } from 'chai'
 import sinon from 'sinon'
 import R from 'ramda'
 import configureTestStore from 'redux-asserts'
+import fetchMock from 'fetch-mock'
 
 import {
   FETCH_PROCESSING,
@@ -9,6 +10,7 @@ import {
   FETCH_FAILURE,
   GET,
   POST,
+  PATCH,
   INITIAL_STATE
 } from './constants'
 import {
@@ -19,7 +21,8 @@ import {
   deriveAction,
   deriveActions,
   deriveReducer,
-  deriveReducers
+  deriveReducers,
+  makeFetchFunc
 } from './hammock'
 import * as actionUtils from './util'
 
@@ -69,6 +72,48 @@ describe('redux REST', () => {
         [clearActionType, 'CLEAR_FOO_BAR']
       ].forEach(([deriver, expectation]) => {
         assert.equal(deriver('fooBar'), expectation)
+      })
+    })
+  })
+
+  describe('makeFetchFunc', () => {
+    let endpoint
+
+    beforeEach(() => {
+      endpoint = {
+        getUrl: '/get',
+        postUrl: '/post',
+        patchUrl: '/patch'
+      }
+      fetchMock.mock('/get', {})
+      fetchMock.mock('/post', {})
+      fetchMock.mock('/patch', {})
+      sandbox = sinon.sandbox.create()
+    })
+
+    afterEach(() => {
+      sandbox.restore()
+    })
+
+    it('should default to window.fetch', () => {
+      let fetchWrapper = makeFetchFunc(endpoint, GET)
+      fetchWrapper()
+      assert(fetchMock.called())
+    })
+
+    it('should use endpoint.fetchFunc, if provided', () => {
+      endpoint.fetchFunc = sandbox.stub()
+      let fetchWrapper = makeFetchFunc(endpoint, GET)
+      fetchWrapper()
+      assert(endpoint.fetchFunc.called)
+    });
+
+    [GET, POST, PATCH].forEach(verb => {
+      it(`should call the endpoint.${R.toLower(verb)}Url function, if provided`, () => {
+        let key = `${R.toLower(verb)}Url`
+        endpoint[key] = sandbox.stub().returns(`/${R.toLower(verb)}`)
+        makeFetchFunc(endpoint, verb)()
+        assert(endpoint[key].called)
       })
     })
   })

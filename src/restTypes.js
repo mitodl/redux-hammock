@@ -28,4 +28,5 @@ export type Endpoint = {
   verbs: Array<string>,
   initialState?: Object,
   usernameInitialState?: Object,
+  fetchFunc?: (url: string, options?: Object) => Promise<*>
 };

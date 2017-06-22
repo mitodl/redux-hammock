@@ -55,7 +55,7 @@ const formatRequest = R.compose(
 
 const formatJSONRequest = R.compose(formatRequest, jsonHeaders)
 
-const _fetchWithCSRF = async (path: string, init: Object = {}): Promise<*> => {
+export const fetchWithCSRF = async (path: string, init: Object = {}): Promise<*> => {
   let response = await fetch(path, formatRequest(init))
   let text = await response.text()
 
@@ -64,10 +64,6 @@ const _fetchWithCSRF = async (path: string, init: Object = {}): Promise<*> => {
   }
   return text
 }
-
-// allow mocking in tests
-export { _fetchWithCSRF as fetchWithCSRF } // eslint-disable-line
-import { fetchWithCSRF } from './django_csrf_fetch' // eslint-disable-line
 
 // resolveEither :: Either -> Promise
 // if the Either is a Left, returns Promise.reject(val)
@@ -90,7 +86,7 @@ const handleEmptyJSON = json => (
  *  - non 2xx status codes will reject the promise returned
  *  - response JSON is returned in place of response
  */
-const _fetchJSONWithCSRF = async (input: string, init: Object = {}): Promise<*> => {
+export const fetchJSONWithCSRF = async (input: string, init: Object = {}): Promise<*> => {
   let response = await fetch(input, formatJSONRequest(init))
   let text = await response.text()
 
@@ -110,7 +106,3 @@ const _fetchJSONWithCSRF = async (input: string, init: Object = {}): Promise<*> 
     handleEmptyJSON
   )(text)
 }
-
-// allow mocking in tests
-export { _fetchJSONWithCSRF as fetchJSONWithCSRF } // eslint-disable-line
-import { fetchJSONWithCSRF } from './django_csrf_fetch' // eslint-disable-line

@@ -1,2 +1,4 @@
 node_modules/
-dist/*
+hammock.js
+django_csrf_fetch.js
+!src/*

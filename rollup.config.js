@@ -7,19 +7,40 @@ const babelConfig = {
   ],
   plugins: [
     'transform-object-rest-spread',
-    'external-helpers'
+    'external-helpers',
+    'transform-runtime'
   ],
   babelrc: false,
-  exclude: 'node_modules/**'
+  exclude: 'node_modules/**',
+  runtimeHelpers: true
 }
+
+const externals = [
+  'isomorphic-fetch',
+  'lodash.snakecase',
+  'ramda',
+  'redux-actions',
+  'sanctuary',
+  'lodash.merge'
+]
 
 export default [
   {
     entry: 'src/hammock.js',
     format: 'cjs',
-    dest: 'dist/hammock.js',
+    dest: 'hammock.js',
     plugins: [
       babel(babelConfig)
-    ]
+    ],
+    external: externals
+  },
+  {
+    entry: 'src/django_csrf_fetch.js',
+    format: 'cjs',
+    dest: 'django_csrf_fetch.js',
+    plugins: [
+      babel(babelConfig)
+    ],
+    external: externals
   }
 ]

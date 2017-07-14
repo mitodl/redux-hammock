@@ -76,5 +76,8 @@
     "ignore": [
       "flow_declarations.js"
     ]
+  },
+  "peerDependencies": {
+    "redux-thunk": "2.x"
   }
 }

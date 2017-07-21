@@ -42,5 +42,14 @@ export default [
       babel(babelConfig)
     ],
     external: externals
+  },
+  {
+    entry: 'src/constants.js',
+    format: 'cjs',
+    dest: 'constants.js',
+    plugins: [
+      babel(babelConfig)
+    ],
+    external: externals
   }
 ]

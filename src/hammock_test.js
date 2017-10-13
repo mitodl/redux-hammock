@@ -11,6 +11,7 @@ import {
   GET,
   POST,
   PATCH,
+  DELETE,
   INITIAL_STATE
 } from './constants'
 import {
@@ -83,11 +84,13 @@ describe('redux REST', () => {
       endpoint = {
         getUrl: '/get',
         postUrl: '/post',
-        patchUrl: '/patch'
+        patchUrl: '/patch',
+        deleteUrl: '/delete'
       }
       fetchMock.mock('/get', {})
       fetchMock.mock('/post', {})
       fetchMock.mock('/patch', {})
+      fetchMock.mock('/delete', {})
       sandbox = sinon.sandbox.create()
     })
 
@@ -108,7 +111,7 @@ describe('redux REST', () => {
       assert(endpoint.fetchFunc.called)
     });
 
-    [GET, POST, PATCH].forEach(verb => {
+    [GET, POST, PATCH, DELETE].forEach(verb => {
       it(`should call the endpoint.${R.toLower(verb)}Url function, if provided`, () => {
         let key = `${R.toLower(verb)}Url`
         endpoint[key] = sandbox.stub().returns(`/${R.toLower(verb)}`)

@@ -4,6 +4,7 @@ import type { RestState } from './restTypes'
 export const GET = 'GET'
 export const PATCH = 'PATCH'
 export const POST = 'POST'
+export const DELETE = 'DELETE'
 
 export const FETCH_PROCESSING = 'FETCH_PROCESSING'
 export const FETCH_SUCCESS = 'FETCH_SUCCESS'

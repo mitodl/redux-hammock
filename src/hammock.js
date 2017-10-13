@@ -14,6 +14,7 @@ import {
   GET,
   PATCH,
   POST,
+  DELETE,
   INITIAL_STATE
 } from './constants'
 import { withUsername, updateStateByUsername } from './util'
@@ -28,7 +29,7 @@ export const failureActionType = (...xs: string[]) => `RECEIVE_${actionize(xs)}_
 
 export const clearActionType = (...xs: string[]) => `CLEAR_${actionize(xs)}`
 
-const defaultRESTPrefixes = { GET, PATCH, POST }
+const defaultRESTPrefixes = { GET, PATCH, POST, DELETE }
 
 const getPrefixForEndpoint = (verb, endpoint) => (
   R.propOr(defaultRESTPrefixes[verb], `${R.toLower(verb)}Prefix`, endpoint)

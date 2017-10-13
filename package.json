@@ -34,8 +34,7 @@
     "lodash.merge": "^4.6.0",
     "lodash.snakecase": "^4.1.1",
     "ramda": "^0.24.1",
-    "redux-actions": "^2.0.3",
-    "sanctuary": "^0.13.2"
+    "redux-actions": "^2.0.3"
   },
   "devDependencies": {
     "babel-core": "^6.25.0",

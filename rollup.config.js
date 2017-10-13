@@ -20,7 +20,6 @@ const externals = [
   'lodash.snakecase',
   'ramda',
   'redux-actions',
-  'sanctuary',
   'lodash.merge'
 ]
 

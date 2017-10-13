@@ -65,15 +65,6 @@ export const fetchWithCSRF = async (path: string, init: Object = {}): Promise<*>
   return text
 }
 
-// resolveEither :: Either -> Promise
-// if the Either is a Left, returns Promise.reject(val)
-// if the Either is a Right, returns Promise.resolve(val)
-// where val is the unwrapped value in the Either
-const resolveEither = S.either(
-  val => Promise.reject(val),
-  val => Promise.resolve(val)
-)
-
 const handleEmptyJSON = json => (
   json.length === 0 ? JSON.stringify({}) : json
 )
@@ -87,22 +78,17 @@ const handleEmptyJSON = json => (
  *  - response JSON is returned in place of response
  */
 export const fetchJSONWithCSRF = async (input: string, init: Object = {}): Promise<*> => {
-  let response = await fetch(input, formatJSONRequest(init))
-  let text = await response.text()
+  const response = await fetch(input, formatJSONRequest(init))
+  const text = await response.text()
 
-  // Here we use the `parseJSON` function, which returns an Either.
-  // Left records an error parsing the JSON, and Right success. `filterE` will turn a Right
-  // into a Left based on a boolean function (similar to filtering a Maybe), and we use `bimap`
-  // to merge an error code into a Left. The `resolveEither` function above will resolve a Right
-  // and reject a Left.
-  return R.compose(
-    resolveEither,
-    S.bimap(
-      R.merge({ errorStatusCode: response.status }),
-      R.identity
-    ),
-    filterE(() => response.ok),
-    parseJSON,
-    handleEmptyJSON
-  )(text)
+  const jsonFriendlyText = handleEmptyJSON(text)
+  const json = JSON.parse(jsonFriendlyText)
+  if (!response.ok) {
+    return Promise.reject({
+      ...json,
+      errorStatusCode: response.status,
+    })
+  }
+
+  return json
 }

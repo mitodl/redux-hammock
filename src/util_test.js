@@ -1,10 +1,9 @@
 // @flow
 import { assert } from 'chai'
-import R from 'ramda'
 
 import {
   withUsername,
-  updateStateByUsername,
+  updateStateByUsername
 } from './util'
 
 describe('utils', () => {

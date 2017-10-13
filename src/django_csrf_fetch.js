@@ -3,8 +3,6 @@
 import 'isomorphic-fetch'
 import R from 'ramda'
 
-import { S, parseJSON, filterE } from './util'
-
 const firstOrNull = R.compose(
   R.defaultTo(null),
   R.head
@@ -84,9 +82,9 @@ export const fetchJSONWithCSRF = async (input: string, init: Object = {}): Promi
   const jsonFriendlyText = handleEmptyJSON(text)
   const json = JSON.parse(jsonFriendlyText)
   if (!response.ok) {
-    return Promise.reject({
+    return Promise.reject({ // eslint-disable-line
       ...json,
-      errorStatusCode: response.status,
+      errorStatusCode: response.status
     })
   }
 

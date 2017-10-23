@@ -63,10 +63,6 @@ export const fetchWithCSRF = async (path: string, init: Object = {}): Promise<*>
   return text
 }
 
-const handleEmptyJSON = json => (
-  json.length === 0 ? JSON.stringify({}) : json
-)
-
 /**
  * Calls to fetch but does a few other things:
  *  - turn cookies on for this domain
@@ -77,10 +73,7 @@ const handleEmptyJSON = json => (
  */
 export const fetchJSONWithCSRF = async (input: string, init: Object = {}): Promise<*> => {
   const response = await fetch(input, formatJSONRequest(init))
-  const text = await response.text()
-
-  const jsonFriendlyText = handleEmptyJSON(text)
-  const json = JSON.parse(jsonFriendlyText)
+  const json = await response.json()
   if (!response.ok) {
     return Promise.reject({ // eslint-disable-line
       ...json,

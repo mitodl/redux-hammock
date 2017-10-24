@@ -158,7 +158,8 @@ describe('django csrf fetch tests', function () {
             method: 'PATCH'
           })
           return {
-            status: 200
+            status: 200,
+            body: '""'
           }
         })
 

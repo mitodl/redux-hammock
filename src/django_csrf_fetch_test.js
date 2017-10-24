@@ -142,6 +142,35 @@ describe('django csrf fetch tests', function () {
         })
       })
 
+      it('handles responses with no data', () => {
+        document.cookie = `csrftoken=${CSRF_TOKEN}`
+        let expectedJSON = {data: true}
+
+        fetchMock.mock('/url', (url, opts) => {
+          assert.deepEqual(opts, {
+            credentials: 'same-origin',
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json',
+              'X-CSRFToken': CSRF_TOKEN
+            },
+            body: JSON.stringify(expectedJSON),
+            method: 'PATCH'
+          })
+          return {
+            status: 200,
+            body: '""'
+          }
+        })
+
+        return fetchJSONWithCSRF('/url', {
+          method: 'PATCH',
+          body: JSON.stringify(expectedJSON)
+        }).then(responseBody => {
+          assert.deepEqual(responseBody, {})
+        })
+      })
+
       for (let statusCode of [300, 400, 500]) {
         it(`rejects the promise if the status code is ${statusCode}`, () => {
           fetchMock.mock('/url', {

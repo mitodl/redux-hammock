@@ -74,7 +74,7 @@ export const fetchWithCSRF = async (path: string, init: Object = {}): Promise<*>
 export const fetchJSONWithCSRF = async (input: string, init: Object = {}): Promise<*> => {
   const response = await fetch(input, formatJSONRequest(init))
   let json = await response.json()
-  json = json === "" ? {} : json
+  json = json === '' ? {} : json
   if (!response.ok) {
     return Promise.reject({ // eslint-disable-line
       ...json,

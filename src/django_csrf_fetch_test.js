@@ -159,7 +159,7 @@ describe('django csrf fetch tests', function () {
           })
           return {
             status: 200,
-            body: '""'
+            body: '{}'
           }
         })
 
@@ -188,6 +188,24 @@ describe('django csrf fetch tests', function () {
           })
         })
       }
+
+      it('handles invalid JSON', () => {
+        fetchMock.mock('/url', {
+          status: 500,
+          body: ''
+        })
+
+        return assert.isRejected(fetchJSONWithCSRF('/url')).then(responseBody => {
+          assert.deepEqual(responseBody, {
+            error: {
+              name: 'FetchError',
+              type: 'invalid-json',
+              message: 'invalid json response body at /url reason: Unexpected end of JSON input'
+            },
+            errorStatusCode: 500
+          })
+        })
+      })
     })
   })
 

@@ -206,9 +206,18 @@ export const deriveReducers = (endpoint: Endpoint, actions: Function) => {
 
   const reducers = R.reduce(R.merge, {}, [
     ...endpoint.verbs.map(verb => deriveReducer(endpoint, actions[R.toLower(verb)], verb)),
-    R.propOr({}, 'extraActions', endpoint),
     { [actions.clearType]: () => initialState }
   ])
+
+  const extraActions = endpoint.extraActions || {}
+  for (const [actionType, reducerFunc] of Object.entries(extraActions)) {
+    if (actionType in reducers) {
+      const oldReducer = reducers[actionType]
+      reducers[actionType] = (state, action) => reducerFunc(oldReducer(state, action), action)
+    } else {
+      reducers[actionType] = reducerFunc
+    }
+  }
 
   return (state: Object = initialState, action: Action<any, any>) => (
     R.has(action.type, reducers) ? reducers[action.type](state, action) : state

@@ -57,7 +57,7 @@ export const fetchWithCSRF = async (path: string, init: Object = {}): Promise<*>
   let response = await fetch(path, formatRequest(init))
   let text = await response.text()
 
-  if (response.status < 200 || response.status >= 300) {
+  if (!response.ok) {
     return Promise.reject([text, response.status]) // eslint-disable-line
   }
   return text
@@ -73,14 +73,21 @@ export const fetchWithCSRF = async (path: string, init: Object = {}): Promise<*>
  */
 export const fetchJSONWithCSRF = async (input: string, init: Object = {}): Promise<*> => {
   const response = await fetch(input, formatJSONRequest(init))
-  let json = await response.json()
-  json = json === '' ? {} : json
-  if (!response.ok) {
-    return Promise.reject({ // eslint-disable-line
-      ...json,
-      errorStatusCode: response.status
+  const statusCode = response.status
+  try {
+    const json = await response.json()
+    if (!response.ok) {
+      return Promise.reject({ // eslint-disable-line
+        ...json,
+        errorStatusCode: statusCode
+      })
+    }
+
+    return json
+  } catch (error) {
+    return Promise.reject({  // eslint-disable-line
+      error: error,
+      errorStatusCode: statusCode
     })
   }
-
-  return json
 }

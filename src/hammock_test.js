@@ -369,6 +369,42 @@ describe('redux REST', () => {
         assert.deepEqual(result, { not: 'legit' })
       })
 
+      it('should pass the state and action to extraActions', () => {
+        endpoint.extraActions = {
+          'MY_NEW_ACTION_TYPE': (state, action) => ({
+            ...state,
+            new: 'state',
+            type: action.type
+          })
+        }
+
+        let reducer = deriveReducers(endpoint, actions)
+        let result = reducer({old: 'state'}, { type: 'MY_NEW_ACTION_TYPE' })
+        assert.deepEqual(result, {
+          old: 'state',
+          new: 'state',
+          type: 'MY_NEW_ACTION_TYPE'
+        })
+      })
+
+      it('should run both reducer functions instead of just one if action is an existing action', () => {
+        endpoint.extraActions = {
+          [actions.get.requestType]: (state, action) => {
+            return { ...state, extraActionStatus: 'extra' }
+          }
+        }
+
+        let reducer = deriveReducers(endpoint, actions)
+        let initialState = { initial: 'State' }
+        let result = reducer(initialState, {
+          type: actions.get.requestType
+        })
+
+        assert.equal(result.extraActionStatus, 'extra')
+        assert.equal(result.initial, 'State')
+        assert.isTrue(result.processing)
+      })
+
       it('should no-op if reducer for an action type is not present', () => {
         let reducer = deriveReducers(endpoint, actions)
 

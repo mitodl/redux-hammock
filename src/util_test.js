@@ -3,7 +3,8 @@ import { assert } from 'chai'
 
 import {
   withUsername,
-  updateStateByUsername
+  updateStateByUsername,
+  renameBy
 } from './util'
 
 describe('utils', () => {
@@ -60,6 +61,24 @@ describe('utils', () => {
         foobar: {
           existing: 'state',
           potato: 'bread'
+        }
+      })
+    })
+  })
+
+  describe('renameBy', () => {
+    it('should rename only top-level keys based on a function', () => {
+      const value = {
+        a: '1',
+        b: {
+          c: 2
+        }
+      }
+      const renameByAppending = renameBy((key) => `${key}Renamed`)
+      assert.deepEqual(renameByAppending(value), {
+        aRenamed: '1',
+        bRenamed: {
+          c: 2
         }
       })
     })

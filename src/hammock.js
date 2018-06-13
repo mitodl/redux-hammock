@@ -3,6 +3,7 @@
 import { createAction } from 'redux-actions'
 import R from 'ramda'
 import snakeCase from 'lodash.snakecase'
+import camelCase from 'lodash.camelcase'
 import 'isomorphic-fetch'
 
 import type { Action, ActionType, Dispatcher } from './reduxTypes'
@@ -11,13 +12,9 @@ import {
   FETCH_PROCESSING,
   FETCH_SUCCESS,
   FETCH_FAILURE,
-  GET,
-  PATCH,
-  POST,
-  DELETE,
   INITIAL_STATE
 } from './constants'
-import { withUsername, updateStateByUsername } from './util'
+import { withUsername, updateStateByUsername, renameBy } from './util'
 
 const actionize = R.compose(R.toUpper, R.join('_'), R.map(snakeCase))
 
@@ -29,21 +26,22 @@ export const failureActionType = (...xs: string[]) => `RECEIVE_${actionize(xs)}_
 
 export const clearActionType = (...xs: string[]) => `CLEAR_${actionize(xs)}`
 
-const defaultRESTPrefixes = { GET, PATCH, POST, DELETE }
-
 const getPrefixForEndpoint = (verb, endpoint) => (
-  R.propOr(defaultRESTPrefixes[verb], `${R.toLower(verb)}Prefix`, endpoint)
+  R.propOr(verb, `${camelCase(verb)}Prefix`, endpoint)
 )
 
 const getUrl = (endpoint: Endpoint, verb: string) => (
-  endpoint[`${R.toLower(verb)}Url`]
+  endpoint[`${camelCase(verb)}Url`]
 )
 
 const simpleOptions = () => ({})
 
 const getMakeOptions = (endpoint: Endpoint, verb: string) => (
-  endpoint[`${R.toLower(verb)}Options`] || simpleOptions
+  endpoint[`${camelCase(verb)}Options`] || simpleOptions
 )
+
+const fetchFuncNameFromVerb = (verb: string) => `${camelCase(verb)}Func`
+const renameVerbFuncs = renameBy(fetchFuncNameFromVerb)
 
 export function makeFetchFunc (endpoint: Endpoint, verb: string): (...args: any) => Promise<*> {
   let url = getUrl(endpoint, verb)
@@ -87,7 +85,7 @@ export const deriveAction = (endpoint: Endpoint, verb: string): DerivedAction =>
 
   const fetchFunc = R.propOr(
     makeFetchFunc(endpoint, verb),
-    `${R.toLower(verb)}Func`,
+    fetchFuncNameFromVerb(verb),
     endpoint
   )
 
@@ -132,7 +130,7 @@ export const deriveActions = (endpoint: Endpoint) => {
       failureType
     } = deriveAction(endpoint, verb)
 
-    let lverb = R.toLower(verb)
+    let lverb = camelCase(verb)
 
     actions[lverb] = action
     actions[lverb].requestType = requestType
@@ -158,9 +156,9 @@ export const deriveActions = (endpoint: Endpoint) => {
 // so the type of the function overall could be rendered
 // deriveReducer :: Endpoint -> Action -> String -> Object String (State -> Action -> State)
 export const deriveReducer = (endpoint: Endpoint, action: Function, verb: string) => {
-  let fetchStatus = `${R.toLower(verb)}Status`
+  let fetchStatus = `${camelCase(verb)}Status`
 
-  let successHandler = R.propOr(R.identity, `${R.toLower(verb)}SuccessHandler`, endpoint)
+  let successHandler = R.propOr(R.identity, `${camelCase(verb)}SuccessHandler`, endpoint)
 
   let updateFunc = (state, action, update) => {
     if (endpoint.namespaceOnUsername) {
@@ -205,7 +203,7 @@ export const deriveReducers = (endpoint: Endpoint, actions: Function) => {
   let initialState = R.propOr(INITIAL_STATE, 'initialState', endpoint)
 
   const reducers = R.reduce(R.merge, {}, [
-    ...endpoint.verbs.map(verb => deriveReducer(endpoint, actions[R.toLower(verb)], verb)),
+    ...endpoint.verbs.map(verb => deriveReducer(endpoint, actions[camelCase(verb)], verb)),
     R.propOr({}, 'extraActions', endpoint),
     { [actions.clearType]: () => initialState }
   ])
@@ -214,3 +212,8 @@ export const deriveReducers = (endpoint: Endpoint, actions: Function) => {
     R.has(action.type, reducers) ? reducers[action.type](state, action) : state
   )
 }
+
+export const deriveVerbFuncs = (verbFuncs: {[string]: Function}) => ({
+  verbs: R.keys(verbFuncs),
+  ...renameVerbFuncs(verbFuncs)
+})

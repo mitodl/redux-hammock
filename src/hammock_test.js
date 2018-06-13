@@ -1,5 +1,6 @@
 import { assert } from 'chai'
 import sinon from 'sinon'
+import camelCase from 'lodash.camelcase'
 import R from 'ramda'
 import configureTestStore from 'redux-asserts'
 import fetchMock from 'fetch-mock'
@@ -23,6 +24,7 @@ import {
   deriveActions,
   deriveReducer,
   deriveReducers,
+  deriveVerbFuncs,
   makeFetchFunc
 } from './hammock'
 import * as actionUtils from './util'
@@ -85,12 +87,14 @@ describe('redux REST', () => {
         getUrl: '/get',
         postUrl: '/post',
         patchUrl: '/patch',
-        deleteUrl: '/delete'
+        deleteUrl: '/delete',
+        otherUrl: '/other'
       }
       fetchMock.mock('/get', {})
       fetchMock.mock('/post', {})
       fetchMock.mock('/patch', {})
       fetchMock.mock('/delete', {})
+      fetchMock.mock('/other', {})
       sandbox = sinon.sandbox.create()
     })
 
@@ -111,10 +115,10 @@ describe('redux REST', () => {
       assert(endpoint.fetchFunc.called)
     });
 
-    [GET, POST, PATCH, DELETE].forEach(verb => {
-      it(`should call the endpoint.${R.toLower(verb)}Url function, if provided`, () => {
-        let key = `${R.toLower(verb)}Url`
-        endpoint[key] = sandbox.stub().returns(`/${R.toLower(verb)}`)
+    [GET, POST, PATCH, DELETE, 'other'].forEach(verb => {
+      it(`should call the endpoint.${camelCase(verb)}Url function, if provided`, () => {
+        let key = `${camelCase(verb)}Url`
+        endpoint[key] = sandbox.stub().returns(`/${camelCase(verb)}`)
         makeFetchFunc(endpoint, verb)()
         assert(endpoint[key].called)
       })
@@ -133,7 +137,8 @@ describe('redux REST', () => {
         name: 'foobar',
         getFunc: sandbox.stub(),
         postFunc: sandbox.stub(),
-        verbs: [GET, POST]
+        otherFunc: sandbox.stub(),
+        verbs: [GET, POST, 'other']
       }
     })
 
@@ -142,9 +147,9 @@ describe('redux REST', () => {
     })
 
     let checkActionTypes = (derived, verb) => {
-      assert.equal(derived.requestType, `REQUEST_${verb}_FOOBAR`)
-      assert.equal(derived.successType, `RECEIVE_${verb}_FOOBAR_SUCCESS`)
-      assert.equal(derived.failureType, `RECEIVE_${verb}_FOOBAR_FAILURE`)
+      assert.equal(derived.requestType, `REQUEST_${R.toUpper(verb)}_FOOBAR`)
+      assert.equal(derived.successType, `RECEIVE_${R.toUpper(verb)}_FOOBAR_SUCCESS`)
+      assert.equal(derived.failureType, `RECEIVE_${R.toUpper(verb)}_FOOBAR_FAILURE`)
     }
 
     describe('deriveAction', () => {
@@ -227,14 +232,14 @@ describe('redux REST', () => {
       it('should derive an action for each HTTP verb', () => {
         let actions = deriveActions(endpoint)
         checkForVerbs(endpoint, verb => {
-          assert.isFunction(actions[R.toLower(verb)])
+          assert.isFunction(actions[camelCase(verb)])
         })
       })
 
       it('should have action types defined', () => {
         let actions = deriveActions(endpoint)
         checkForVerbs(endpoint, verb => {
-          checkActionTypes(actions[R.toLower(verb)], verb)
+          checkActionTypes(actions[camelCase(verb)], verb)
         })
       })
 
@@ -252,7 +257,7 @@ describe('redux REST', () => {
     beforeEach(() => {
       endpoint = {
         name: 'foobar',
-        verbs: [GET, POST]
+        verbs: [GET, POST, 'other']
       }
 
       actions = deriveActions(endpoint)
@@ -269,7 +274,7 @@ describe('redux REST', () => {
     describe('deriveReducer', () => {
       it('should define a function for each action type on the corresponding action', () => {
         checkForVerbs(endpoint, verb => {
-          let action = actions[R.toLower(verb)]
+          let action = actions[camelCase(verb)]
           let reducer = deriveReducer(endpoint, action, verb)
 
           checkForActionTypes(action, type => {
@@ -280,11 +285,11 @@ describe('redux REST', () => {
 
       it('should represent a request in flight', () => {
         checkForVerbs(endpoint, verb => {
-          let action = actions[R.toLower(verb)]
+          let action = actions[camelCase(verb)]
           let reducer = deriveReducer(endpoint, action, verb)
           let result = reducer[action.requestType]({}, { type: 'ACTION', payload: 'ignored' })
           assert.deepEqual(result, {
-            [`${R.toLower(verb)}Status`]: FETCH_PROCESSING,
+            [`${camelCase(verb)}Status`]: FETCH_PROCESSING,
             loaded: false,
             processing: true
           })
@@ -293,13 +298,13 @@ describe('redux REST', () => {
 
       it('should represent success', () => {
         checkForVerbs(endpoint, verb => {
-          let action = actions[R.toLower(verb)]
+          let action = actions[camelCase(verb)]
           let reducer = deriveReducer(endpoint, action, verb)
           let result = reducer[action.successType](
             {}, { type: 'ACTION', payload: { some: 'DATA' } }
           )
           assert.deepEqual(result, {
-            [`${R.toLower(verb)}Status`]: FETCH_SUCCESS,
+            [`${camelCase(verb)}Status`]: FETCH_SUCCESS,
             loaded: true,
             processing: false,
             data: { some: 'DATA' }
@@ -309,13 +314,13 @@ describe('redux REST', () => {
 
       it('should represent failure', () => {
         checkForVerbs(endpoint, verb => {
-          let action = actions[R.toLower(verb)]
+          let action = actions[camelCase(verb)]
           let reducer = deriveReducer(endpoint, action, verb)
           let result = reducer[action.failureType](
             {}, { type: 'ACTION', payload: { some: 'ERROR' } }
           )
           assert.deepEqual(result, {
-            [`${R.toLower(verb)}Status`]: FETCH_FAILURE,
+            [`${camelCase(verb)}Status`]: FETCH_FAILURE,
             loaded: true,
             processing: false,
             error: { some: 'ERROR' }
@@ -351,7 +356,7 @@ describe('redux REST', () => {
         let reducer = deriveReducers(endpoint, actions)
 
         checkForVerbs(endpoint, verb => {
-          let action = actions[R.toLower(verb)]
+          let action = actions[camelCase(verb)]
           checkForActionTypes(action, type => {
             let result = reducer({}, { type: type, payload: 'SOME_DATA' })
             assert.notDeepEqual(result, {})
@@ -391,6 +396,26 @@ describe('redux REST', () => {
             processing: false
           }
         })
+      })
+    })
+
+    describe('deriveVerbFuncs', () => {
+      const verbFuncs = {
+        one: () => 1,
+        two: () => 2
+      }
+
+      it('should populate verbs', () => {
+        const derived = deriveVerbFuncs(verbFuncs)
+
+        assert.deepEqual(derived.verbs, ['one', 'two'])
+      })
+
+      it('should rename verb funcs', () => {
+        const derived = deriveVerbFuncs(verbFuncs)
+
+        assert.equal(derived.oneFunc(), 1)
+        assert.equal(derived.twoFunc(), 2)
       })
     })
   })

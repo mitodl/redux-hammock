@@ -20,3 +20,6 @@ export const withUsername = (type: ActionType, payloadFunc: Function = R.nthArg(
 export const updateStateByUsername = (state: Object, username: string, update: Object) => (
   merge({}, state, { [username]: update })
 )
+
+// from: https://github.com/ramda/ramda/wiki/Cookbook#rename-keys-of-an-object-by-a-function
+export const renameBy = R.curry((fn, obj) => R.pipe(R.toPairs, R.map(R.adjust(fn, 0)), R.fromPairs)(obj))

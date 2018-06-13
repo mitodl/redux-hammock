@@ -1,4 +1,6 @@
 node_modules/
 hammock.js
 django_csrf_fetch.js
+constants.js
 !src/*
+*.tgz

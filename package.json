@@ -1,6 +1,6 @@
 {
   "name": "redux-hammock",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "A library for simplyfing the use of redux-thunk with REST APIs",
   "main": "hammock.js",
   "files": [
@@ -12,7 +12,7 @@
     "url": "https://github.com/mitodl/redux-hammock"
   },
   "scripts": {
-    "test": "mocha --require babel-polyfill --compilers js:babel-register src/*_test.js",
+    "test": "mocha --require babel-polyfill --require babel-register src/*_test.js",
     "watch": "mocha --watch --require babel-polyfill --compilers js:babel-register src/*_test.js",
     "lint": "standard --env mocha",
     "lint:verbose": "standard --env mocha --verbose",
@@ -29,13 +29,13 @@
   "license": "BSD-3-Clause",
   "dependencies": {
     "babel-polyfill": "^6.23.0",
-    "babel-runtime": "^6.23.0",
+    "babel-runtime": "^6.26.0",
     "isomorphic-fetch": "^2.2.1",
-    "lodash.merge": "^4.6.0",
+    "lodash.camelcase": "^4.3.0",
+    "lodash.merge": "^4.6.2",
     "lodash.snakecase": "^4.1.1",
-    "lodash.camelcase": "^4.1.1",
-    "ramda": "^0.24.1",
-    "redux-actions": "^2.0.3"
+    "ramda": "0.24.1",
+    "redux-actions": "^2.6.5"
   },
   "devDependencies": {
     "babel-core": "^6.25.0",
@@ -46,18 +46,18 @@
     "babel-preset-env": "^1.5.2",
     "babel-preset-flow": "^6.23.0",
     "babel-register": "^6.24.1",
-    "chai": "^4.0.2",
-    "chai-as-promised": "^7.0.0",
+    "chai": "^4.2.0",
+    "chai-as-promised": "^7.1.1",
     "eslint-plugin-flowtype": "^2.34.0",
     "fetch-mock": "^5.11.0",
     "flow-bin": "^0.47.0",
-    "jsdom": "^11.0.0",
+    "jsdom": "^15.1.1",
     "jsdom-global": "^3.0.2",
-    "mocha": "^3.4.2",
-    "redux-asserts": "^0.0.10",
+    "mocha": "^6.2.0",
+    "redux-asserts": "^0.0.11",
     "rollup": "^0.43.0",
     "rollup-plugin-babel": "^2.7.1",
-    "sinon": "^2.3.4",
+    "sinon": "^7.4.1",
     "standard": "^10.0.2"
   },
   "babel": {

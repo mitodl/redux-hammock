@@ -95,7 +95,7 @@ describe('redux REST', () => {
       fetchMock.mock('/patch', {})
       fetchMock.mock('/delete', {})
       fetchMock.mock('/other', {})
-      sandbox = sinon.sandbox.create()
+      sandbox = sinon.createSandbox()
     })
 
     afterEach(() => {
@@ -129,7 +129,7 @@ describe('redux REST', () => {
     let endpoint
 
     beforeEach(() => {
-      sandbox = sinon.sandbox.create()
+      sandbox = sinon.createSandbox()
       store = configureTestStore(R.identity)
       dispatchThen = store.createDispatchThen(state => state)
 
@@ -179,12 +179,12 @@ describe('redux REST', () => {
 
       it('should dispatch actions when the request fails', () => {
         let derived = deriveAction(endpoint, GET)
-        endpoint.getFunc.returns(Promise.reject(new Error()))
+        endpoint.getFunc.returns(Error())
 
         return dispatchThen(derived.action(), [
           derived.requestType,
           derived.failureType
-        ]).then(() => {
+        ]).catch(() => {
           assert(endpoint.getFunc.called)
         })
       });

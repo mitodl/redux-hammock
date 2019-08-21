@@ -1,4 +1,5 @@
 [ignore]
+.*/node_modules/log-symbols/.*
 
 [include]
 ./src

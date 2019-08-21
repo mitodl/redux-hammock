@@ -3,7 +3,6 @@ import fetchMock from 'fetch-mock/src/server'
 import sinon from 'sinon'
 import chaiAsPromised from 'chai-as-promised'
 import jsdomGlobal from 'jsdom-global'
-import { changeURL } from 'jsdom/lib/old-api'
 
 import {
   getCookie,
@@ -20,16 +19,8 @@ describe('django csrf fetch tests', function () {
   let sandbox, cleanup
 
   beforeEach(() => {
-    sandbox = sinon.sandbox.create()
+    sandbox = sinon.createSandbox()
     cleanup = jsdomGlobal()
-    Object.defineProperty(window, 'location', { // eslint-disable-line accessor-pairs
-      set: value => {
-        if (!value.startsWith('http')) {
-          value = `http://fake${value}`
-        }
-        changeURL(window, value)
-      }
-    })
   })
 
   afterEach(() => {

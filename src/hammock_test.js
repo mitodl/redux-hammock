@@ -48,7 +48,7 @@ describe('redux REST', () => {
           ['hello', 'there'],
           ['that', 'is', 'great']
         ].forEach(argSet => {
-          let derivedType = actionDeriver(...argSet)
+          const derivedType = actionDeriver(...argSet)
           argSet.forEach(str => {
             assert.include(derivedType, R.toUpper(str))
           })
@@ -100,24 +100,25 @@ describe('redux REST', () => {
 
     afterEach(() => {
       sandbox.restore()
+      fetchMock.restore()
     })
 
     it('should default to window.fetch', () => {
-      let fetchWrapper = makeFetchFunc(endpoint, GET)
+      const fetchWrapper = makeFetchFunc(endpoint, GET)
       fetchWrapper()
       assert(fetchMock.called())
     })
 
     it('should use endpoint.fetchFunc, if provided', () => {
       endpoint.fetchFunc = sandbox.stub()
-      let fetchWrapper = makeFetchFunc(endpoint, GET)
+      const fetchWrapper = makeFetchFunc(endpoint, GET)
       fetchWrapper()
       assert(endpoint.fetchFunc.called)
     });
 
     [GET, POST, PATCH, DELETE, 'other'].forEach(verb => {
       it(`should call the endpoint.${camelCase(verb)}Url function, if provided`, () => {
-        let key = `${camelCase(verb)}Url`
+        const key = `${camelCase(verb)}Url`
         endpoint[key] = sandbox.stub().returns(`/${camelCase(verb)}`)
         makeFetchFunc(endpoint, verb)()
         assert(endpoint[key].called)
@@ -146,7 +147,7 @@ describe('redux REST', () => {
       sandbox.restore()
     })
 
-    let checkActionTypes = (derived, verb) => {
+    const checkActionTypes = (derived, verb) => {
       assert.equal(derived.requestType, `REQUEST_${R.toUpper(verb)}_FOOBAR`)
       assert.equal(derived.successType, `RECEIVE_${R.toUpper(verb)}_FOOBAR_SUCCESS`)
       assert.equal(derived.failureType, `RECEIVE_${R.toUpper(verb)}_FOOBAR_FAILURE`)
@@ -154,19 +155,19 @@ describe('redux REST', () => {
 
     describe('deriveAction', () => {
       it('should return a function', () => {
-        let derived = deriveAction(endpoint, GET)
+        const derived = deriveAction(endpoint, GET)
         assert.isFunction(derived.action)
       })
 
       it('should define appropriate action types', () => {
         checkForVerbs(endpoint, verb => {
-          let derived = deriveAction(endpoint, verb)
+          const derived = deriveAction(endpoint, verb)
           checkActionTypes(derived, verb)
         })
       })
 
       it('should dispatch actions when the request succeeds', () => {
-        let derived = deriveAction(endpoint, GET)
+        const derived = deriveAction(endpoint, GET)
         endpoint.getFunc.returns(Promise.resolve())
 
         return dispatchThen(derived.action(), [
@@ -178,7 +179,7 @@ describe('redux REST', () => {
       })
 
       it('should dispatch actions when the request fails', () => {
-        let derived = deriveAction(endpoint, GET)
+        const derived = deriveAction(endpoint, GET)
         endpoint.getFunc.returns(Error())
 
         return dispatchThen(derived.action(), [
@@ -195,7 +196,7 @@ describe('redux REST', () => {
         ['args', 'aaargs', 'aaaargs']
       ].forEach(args => {
         it(`should pass any arguments to the fetch function (${args.length} args)`, () => {
-          let derived = deriveAction(endpoint, GET)
+          const derived = deriveAction(endpoint, GET)
           endpoint.getFunc.returns(Promise.resolve())
           return dispatchThen(derived.action(args), [
             derived.requestType,
@@ -210,19 +211,19 @@ describe('redux REST', () => {
         endpoint.namespaceOnUsername = true
         endpoint.getFunc.returns(Promise.resolve(['data']))
 
-        let withUsernameReturnStub = sandbox.stub()
+        const withUsernameReturnStub = sandbox.stub()
         withUsernameReturnStub.returns({ type: 'TESTING_WITH_USERNAME' })
-        let withUsernameStub = sandbox.stub(actionUtils, 'withUsername')
+        const withUsernameStub = sandbox.stub(actionUtils, 'withUsername')
         withUsernameStub.returns(withUsernameReturnStub)
 
-        let derived = deriveAction(endpoint, GET)
+        const derived = deriveAction(endpoint, GET)
         return dispatchThen(derived.action('username'), [
           'TESTING_WITH_USERNAME',
           'TESTING_WITH_USERNAME'
         ]).then(() => {
           assert.deepEqual(withUsernameReturnStub.args, [
-            [ 'username' ],
-            [ 'username', [ 'data' ] ]
+            ['username'],
+            ['username', ['data']]
           ])
         })
       })
@@ -230,21 +231,21 @@ describe('redux REST', () => {
 
     describe('deriveActions', () => {
       it('should derive an action for each HTTP verb', () => {
-        let actions = deriveActions(endpoint)
+        const actions = deriveActions(endpoint)
         checkForVerbs(endpoint, verb => {
           assert.isFunction(actions[camelCase(verb)])
         })
       })
 
       it('should have action types defined', () => {
-        let actions = deriveActions(endpoint)
+        const actions = deriveActions(endpoint)
         checkForVerbs(endpoint, verb => {
           checkActionTypes(actions[camelCase(verb)], verb)
         })
       })
 
       it('should include an action type to clear the store', () => {
-        let actions = deriveActions(endpoint)
+        const actions = deriveActions(endpoint)
         assert.equal(actions.clearType, `CLEAR_${R.toUpper(endpoint.name)}`)
         assert.isFunction(actions.clear)
       })
@@ -263,7 +264,7 @@ describe('redux REST', () => {
       actions = deriveActions(endpoint)
     })
 
-    let checkForActionTypes = (action, cb) => {
+    const checkForActionTypes = (action, cb) => {
       [
         action.requestType,
         action.successType,
@@ -274,8 +275,8 @@ describe('redux REST', () => {
     describe('deriveReducer', () => {
       it('should define a function for each action type on the corresponding action', () => {
         checkForVerbs(endpoint, verb => {
-          let action = actions[camelCase(verb)]
-          let reducer = deriveReducer(endpoint, action, verb)
+          const action = actions[camelCase(verb)]
+          const reducer = deriveReducer(endpoint, action, verb)
 
           checkForActionTypes(action, type => {
             assert.isFunction(reducer[type])
@@ -285,9 +286,9 @@ describe('redux REST', () => {
 
       it('should represent a request in flight', () => {
         checkForVerbs(endpoint, verb => {
-          let action = actions[camelCase(verb)]
-          let reducer = deriveReducer(endpoint, action, verb)
-          let result = reducer[action.requestType]({}, { type: 'ACTION', payload: 'ignored' })
+          const action = actions[camelCase(verb)]
+          const reducer = deriveReducer(endpoint, action, verb)
+          const result = reducer[action.requestType]({}, { type: 'ACTION', payload: 'ignored' })
           assert.deepEqual(result, {
             [`${camelCase(verb)}Status`]: FETCH_PROCESSING,
             loaded: false,
@@ -298,9 +299,9 @@ describe('redux REST', () => {
 
       it('should represent success', () => {
         checkForVerbs(endpoint, verb => {
-          let action = actions[camelCase(verb)]
-          let reducer = deriveReducer(endpoint, action, verb)
-          let result = reducer[action.successType](
+          const action = actions[camelCase(verb)]
+          const reducer = deriveReducer(endpoint, action, verb)
+          const result = reducer[action.successType](
             {}, { type: 'ACTION', payload: { some: 'DATA' } }
           )
           assert.deepEqual(result, {
@@ -314,9 +315,9 @@ describe('redux REST', () => {
 
       it('should represent failure', () => {
         checkForVerbs(endpoint, verb => {
-          let action = actions[camelCase(verb)]
-          let reducer = deriveReducer(endpoint, action, verb)
-          let result = reducer[action.failureType](
+          const action = actions[camelCase(verb)]
+          const reducer = deriveReducer(endpoint, action, verb)
+          const result = reducer[action.failureType](
             {}, { type: 'ACTION', payload: { some: 'ERROR' } }
           )
           assert.deepEqual(result, {
@@ -331,8 +332,8 @@ describe('redux REST', () => {
 
     describe('deriveReducers', () => {
       it('should clear itself', () => {
-        let reducer = deriveReducers(endpoint, actions)
-        let result = reducer({}, { type: actions.clearType })
+        const reducer = deriveReducers(endpoint, actions)
+        const result = reducer({}, { type: actions.clearType })
         assert.deepEqual(result, INITIAL_STATE)
       })
 
@@ -342,23 +343,23 @@ describe('redux REST', () => {
           wow: 'yeah...'
         }
 
-        let reducer = deriveReducers(endpoint, actions)
-        let result = reducer({}, { type: actions.clearType })
+        const reducer = deriveReducers(endpoint, actions)
+        const result = reducer({}, { type: actions.clearType })
         assert.deepEqual(result, endpoint.initialState)
       })
 
       it('should return a function', () => {
-        let reducer = deriveReducers(endpoint, actions)
+        const reducer = deriveReducers(endpoint, actions)
         assert.isFunction(reducer)
       })
 
       it('should return a different state for all defined action types', () => {
-        let reducer = deriveReducers(endpoint, actions)
+        const reducer = deriveReducers(endpoint, actions)
 
         checkForVerbs(endpoint, verb => {
-          let action = actions[camelCase(verb)]
+          const action = actions[camelCase(verb)]
           checkForActionTypes(action, type => {
-            let result = reducer({}, { type: type, payload: 'SOME_DATA' })
+            const result = reducer({}, { type: type, payload: 'SOME_DATA' })
             assert.notDeepEqual(result, {})
           })
         })
@@ -366,28 +367,28 @@ describe('redux REST', () => {
 
       it('should include any extraActions', () => {
         endpoint.extraActions = {
-          'MY_NEW_ACTION_TYPE': () => ({ not: 'legit' })
+          MY_NEW_ACTION_TYPE: () => ({ not: 'legit' })
         }
 
-        let reducer = deriveReducers(endpoint, actions)
-        let result = reducer({}, { type: 'MY_NEW_ACTION_TYPE' })
+        const reducer = deriveReducers(endpoint, actions)
+        const result = reducer({}, { type: 'MY_NEW_ACTION_TYPE' })
         assert.deepEqual(result, { not: 'legit' })
       })
 
       it('should no-op if reducer for an action type is not present', () => {
-        let reducer = deriveReducers(endpoint, actions)
+        const reducer = deriveReducers(endpoint, actions)
 
-        let initialState = { initial: 'State' }
-        let result = reducer(initialState, { type: '❤❤❤❤❤', payload: '<3<3<3<3<3' })
+        const initialState = { initial: 'State' }
+        const result = reducer(initialState, { type: '❤❤❤❤❤', payload: '<3<3<3<3<3' })
         assert.equal(result, initialState)
       })
 
       it('should namespace on username, if flag is set', () => {
         endpoint.namespaceOnUsername = true
-        let actions = deriveActions(endpoint)
-        let reducer = deriveReducers(endpoint, actions)
+        const actions = deriveActions(endpoint)
+        const reducer = deriveReducers(endpoint, actions)
 
-        let result = reducer({}, { meta: 'username', payload: 'foobar', type: actions.get.successType })
+        const result = reducer({}, { meta: 'username', payload: 'foobar', type: actions.get.successType })
         assert.deepEqual(result, {
           username: {
             getStatus: 'FETCH_SUCCESS',

@@ -1,5 +1,5 @@
 import chai, { assert } from 'chai'
-import fetchMock from 'fetch-mock/src/server'
+import fetchMock from 'fetch-mock'
 import sinon from 'sinon'
 import chaiAsPromised from 'chai-as-promised'
 import jsdomGlobal from 'jsdom-global'
@@ -14,7 +14,7 @@ import {
 chai.use(chaiAsPromised)
 
 describe('django csrf fetch tests', function () {
-  this.timeout(5000)  // eslint-disable-line no-invalid-this
+  this.timeout(5000) // eslint-disable-line no-invalid-this
 
   let sandbox, cleanup
 
@@ -41,7 +41,7 @@ describe('django csrf fetch tests', function () {
       })
 
       it('fetches and populates appropriate headers for GET', () => {
-        let body = 'body'
+        const body = 'body'
 
         fetchMock.mock('/url', (url, opts) => {
           assert.deepEqual(opts, {
@@ -64,9 +64,9 @@ describe('django csrf fetch tests', function () {
         })
       })
 
-      for (let method of ['PATCH', 'PUT', 'POST']) {
+      for (const method of ['PATCH', 'PUT', 'POST']) {
         it(`fetches and populates appropriate headers for ${method}`, () => {
-          let body = 'body'
+          const body = 'body'
 
           fetchMock.mock('/url', (url, opts) => {
             assert.deepEqual(opts, {
@@ -93,7 +93,7 @@ describe('django csrf fetch tests', function () {
         })
       }
 
-      for (let statusCode of [300, 400, 500]) {
+      for (const statusCode of [300, 400, 500]) {
         it(`rejects the promise if the status code is ${statusCode}`, () => {
           fetchMock.get('/url', statusCode)
           return assert.isRejected(fetchWithCSRF('/url'))
@@ -104,13 +104,13 @@ describe('django csrf fetch tests', function () {
     describe('fetchJSONWithCSRF', () => {
       it('fetches and populates appropriate headers for JSON', () => {
         document.cookie = `csrftoken=${CSRF_TOKEN}`
-        let expectedJSON = {data: true}
+        const expectedJSON = { data: true }
 
         fetchMock.mock('/url', (url, opts) => {
           assert.deepEqual(opts, {
             credentials: 'same-origin',
             headers: {
-              'Accept': 'application/json',
+              Accept: 'application/json',
               'Content-Type': 'application/json',
               'X-CSRFToken': CSRF_TOKEN
             },
@@ -128,20 +128,20 @@ describe('django csrf fetch tests', function () {
           body: JSON.stringify(expectedJSON)
         }).then(responseBody => {
           assert.deepEqual(responseBody, {
-            'json': 'here'
+            json: 'here'
           })
         })
       })
 
       it('handles responses with no data', () => {
         document.cookie = `csrftoken=${CSRF_TOKEN}`
-        let expectedJSON = {data: true}
+        const expectedJSON = { data: true }
 
         fetchMock.mock('/url', (url, opts) => {
           assert.deepEqual(opts, {
             credentials: 'same-origin',
             headers: {
-              'Accept': 'application/json',
+              Accept: 'application/json',
               'Content-Type': 'application/json',
               'X-CSRFToken': CSRF_TOKEN
             },
@@ -162,7 +162,7 @@ describe('django csrf fetch tests', function () {
         })
       })
 
-      for (let statusCode of [300, 400, 500]) {
+      for (const statusCode of [300, 400, 500]) {
         it(`rejects the promise if the status code is ${statusCode}`, () => {
           fetchMock.mock('/url', {
             status: statusCode,
@@ -187,14 +187,9 @@ describe('django csrf fetch tests', function () {
         })
 
         return assert.isRejected(fetchJSONWithCSRF('/url')).then(responseBody => {
-          assert.deepEqual(responseBody, {
-            error: {
-              name: 'FetchError',
-              type: 'invalid-json',
-              message: 'invalid json response body at /url reason: Unexpected end of JSON input'
-            },
-            errorStatusCode: 500
-          })
+          assert.equal(responseBody.errorStatusCode, 500)
+          assert.equal(responseBody.error.type, 'invalid-json')
+          assert.include(responseBody.error.message, 'invalid json response body at /url reason: Unexpected end of JSON input')
         })
       })
     })

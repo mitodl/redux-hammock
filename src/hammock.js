@@ -44,14 +44,14 @@ const fetchFuncNameFromVerb = (verb: string) => `${camelCase(verb)}Func`
 const renameVerbFuncs = renameBy(fetchFuncNameFromVerb)
 
 export function makeFetchFunc (endpoint: Endpoint, verb: string): (...args: any) => Promise<*> {
-  let url = getUrl(endpoint, verb)
-  let options = getMakeOptions(endpoint, verb)
-  let fetchImplementation = endpoint.fetchFunc || fetch
+  const url = getUrl(endpoint, verb)
+  const options = getMakeOptions(endpoint, verb)
+  const fetchImplementation = endpoint.fetchFunc || fetch
   return (...args) => {
     return fetchImplementation(
       typeof url === 'function'
-      ? url(...args)
-      : url,
+        ? url(...args)
+        : url,
       options(...args)
     )
   }
@@ -121,7 +121,7 @@ export const deriveAction = (endpoint: Endpoint, verb: string): DerivedAction =>
 // for each one we derive an action. The derived action types are stuck on
 // the function object, as a convenience.
 export const deriveActions = (endpoint: Endpoint) => {
-  let actions = {}
+  const actions = {}
   endpoint.verbs.forEach(verb => {
     const {
       action,
@@ -130,14 +130,14 @@ export const deriveActions = (endpoint: Endpoint) => {
       failureType
     } = deriveAction(endpoint, verb)
 
-    let lverb = camelCase(verb)
+    const lverb = camelCase(verb)
 
     actions[lverb] = action
     actions[lverb].requestType = requestType
     actions[lverb].successType = successType
     actions[lverb].failureType = failureType
   })
-  let clearType = clearActionType(endpoint.name)
+  const clearType = clearActionType(endpoint.name)
   actions.clearType = clearType
   if (endpoint.namespaceOnUsername) {
     actions.clear = withUsername(clearType)
@@ -156,11 +156,11 @@ export const deriveActions = (endpoint: Endpoint) => {
 // so the type of the function overall could be rendered
 // deriveReducer :: Endpoint -> Action -> String -> Object String (State -> Action -> State)
 export const deriveReducer = (endpoint: Endpoint, action: Function, verb: string) => {
-  let fetchStatus = `${camelCase(verb)}Status`
+  const fetchStatus = `${camelCase(verb)}Status`
 
-  let successHandler = R.propOr(R.identity, `${camelCase(verb)}SuccessHandler`, endpoint)
+  const successHandler = R.propOr(R.identity, `${camelCase(verb)}SuccessHandler`, endpoint)
 
-  let updateFunc = (state, action, update) => {
+  const updateFunc = (state, action, update) => {
     if (endpoint.namespaceOnUsername) {
       return updateStateByUsername(
         state,
@@ -200,7 +200,7 @@ export const deriveReducer = (endpoint: Endpoint, action: Function, verb: string
 }
 
 export const deriveReducers = (endpoint: Endpoint, actions: Function) => {
-  let initialState = R.propOr(INITIAL_STATE, 'initialState', endpoint)
+  const initialState = R.propOr(INITIAL_STATE, 'initialState', endpoint)
 
   const reducers = R.reduce(R.merge, {}, [
     ...endpoint.verbs.map(verb => deriveReducer(endpoint, actions[camelCase(verb)], verb)),

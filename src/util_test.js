@@ -9,15 +9,15 @@ import {
 
 describe('utils', () => {
   describe('withUsername', () => {
-    let TYPE = 'TYPE'
+    const TYPE = 'TYPE'
     it('should return an action creator, given a type', () => {
-      let creator = withUsername(TYPE)
+      const creator = withUsername(TYPE)
       assert.isFunction(creator)
     })
 
     it('should add a username and a payload', () => {
-      let creator = withUsername(TYPE)
-      let action = creator('username', { my: 'payload' })
+      const creator = withUsername(TYPE)
+      const action = creator('username', { my: 'payload' })
       assert.deepEqual(action, {
         type: TYPE,
         payload: { my: 'payload' },
@@ -28,7 +28,7 @@ describe('utils', () => {
 
   describe('updateStateByUsername', () => {
     it('should namespace the update under the username', () => {
-      let state = {}
+      const state = {}
       assert.deepEqual(updateStateByUsername(state, 'foobar', { potato: 'bread' }), {
         foobar: {
           potato: 'bread'
@@ -37,7 +37,7 @@ describe('utils', () => {
     })
 
     it('should leave stuff already on the state intact', () => {
-      let state = { potato: 'bread' }
+      const state = { potato: 'bread' }
       assert.deepEqual(updateStateByUsername(state, 'foobar', { rice: 'bread' }), {
         foobar: {
           rice: 'bread'
@@ -47,7 +47,7 @@ describe('utils', () => {
     })
 
     it('should update over the old state for the username', () => {
-      let state = { foobar: { potato: 'pancake' } }
+      const state = { foobar: { potato: 'pancake' } }
       assert.deepEqual(updateStateByUsername(state, 'foobar', { potato: 'bread' }), {
         foobar: {
           potato: 'bread'
@@ -56,7 +56,7 @@ describe('utils', () => {
     })
 
     it('should deeply merge the update with the current state', () => {
-      let state = { foobar: { existing: 'state' } }
+      const state = { foobar: { existing: 'state' } }
       assert.deepEqual(updateStateByUsername(state, 'foobar', { potato: 'bread' }), {
         foobar: {
           existing: 'state',

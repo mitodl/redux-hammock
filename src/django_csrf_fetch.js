@@ -12,10 +12,10 @@ export const getCookie: (n: string) => string|null = R.compose(
   firstOrNull,
   name => (
     (document.cookie || '')
-    .split(';')
-    .map(cookie => cookie.trim())
-    .filter(cookie => cookie.substring(0, name.length + 1) === `${name}=`)
-    .map(cookie => decodeURIComponent(cookie.substring(name.length + 1)))
+      .split(';')
+      .map(cookie => cookie.trim())
+      .filter(cookie => cookie.substring(0, name.length + 1) === `${name}=`)
+      .map(cookie => decodeURIComponent(cookie.substring(name.length + 1)))
   )
 )
 
@@ -42,10 +42,12 @@ const csrfToken = R.unless(
   )
 )
 
-const jsonHeaders = R.merge({ headers: {
-  'Content-Type': 'application/json',
-  'Accept': 'application/json'
-}})
+const jsonHeaders = R.merge({
+  headers: {
+    'Content-Type': 'application/json',
+    Accept: 'application/json'
+  }
+})
 
 const formatRequest = R.compose(
   csrfToken, credentials, method, headers
@@ -54,8 +56,8 @@ const formatRequest = R.compose(
 const formatJSONRequest = R.compose(formatRequest, jsonHeaders)
 
 export const fetchWithCSRF = async (path: string, init: Object = {}): Promise<*> => {
-  let response = await fetch(path, formatRequest(init))
-  let text = await response.text()
+  const response = await fetch(path, formatRequest(init))
+  const text = await response.text()
 
   if (!response.ok) {
     return Promise.reject([text, response.status]) // eslint-disable-line

@@ -1,6 +1,6 @@
 {
   "name": "redux-hammock",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "A library for simplyfing the use of redux-thunk with REST APIs",
   "main": "hammock.js",
   "files": [

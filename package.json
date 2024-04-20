@@ -50,7 +50,7 @@
     "chai-as-promised": "^7.1.1",
     "eslint-plugin-flowtype": "^5.2.0",
     "fetch-mock": "^9.11.0",
-    "flow-bin": "^0.233.0",
+    "flow-bin": "^0.234.0",
     "jsdom": "^15.1.1",
     "jsdom-global": "^3.0.2",
     "mocha": "^6.2.0",

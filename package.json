@@ -15,6 +15,7 @@
     "test": "mocha --require babel-polyfill --require babel-register src/*_test.js",
     "watch": "mocha --watch --require babel-polyfill --compilers js:babel-register src/*_test.js",
     "lint": "standard --env mocha",
+    "lint:fix": "standard --env mocha --fix",
     "lint:verbose": "standard --env mocha --verbose",
     "flow": "flow",
     "fmt": "standard --env mocha --fix",

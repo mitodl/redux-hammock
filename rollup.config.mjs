@@ -25,27 +25,33 @@ const externals = [
 
 export default [
   {
-    entry: 'src/hammock.js',
-    format: 'cjs',
-    dest: 'hammock.js',
+    input: 'src/hammock.js',
+    output: {
+      file: 'hammock.js',
+      format: 'cjs'
+    },
     plugins: [
       babel(babelConfig)
     ],
     external: externals
   },
   {
-    entry: 'src/django_csrf_fetch.js',
-    format: 'cjs',
-    dest: 'django_csrf_fetch.js',
+    input: 'src/django_csrf_fetch.js',
+    output: {
+      file: 'django_csrf_fetch.js',
+      format: 'cjs'
+    },
     plugins: [
       babel(babelConfig)
     ],
     external: externals
   },
   {
-    entry: 'src/constants.js',
-    format: 'cjs',
-    dest: 'constants.js',
+    input: 'src/constants.js',
+    output: {
+      file: 'constants.js',
+      format: 'cjs'
+    },
     plugins: [
       babel(babelConfig)
     ],

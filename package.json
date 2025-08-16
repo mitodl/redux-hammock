@@ -35,7 +35,7 @@
     "lodash.camelcase": "^4.3.0",
     "lodash.merge": "^4.6.2",
     "lodash.snakecase": "^4.1.1",
-    "ramda": "0.24.1",
+    "ramda": "0.31.3",
     "redux-actions": "^2.6.5"
   },
   "devDependencies": {

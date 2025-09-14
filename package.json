@@ -80,6 +80,6 @@
     ]
   },
   "peerDependencies": {
-    "redux-thunk": "2.x"
+    "redux-thunk": "3.x"
   }
 }

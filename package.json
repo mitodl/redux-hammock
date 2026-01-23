@@ -52,7 +52,7 @@
     "eslint-plugin-flowtype": "^5.2.0",
     "fetch-mock": "^9.11.0",
     "flow-bin": "^0.281.0",
-    "jsdom": "^15.1.1",
+    "jsdom": "^27.0.0",
     "jsdom-global": "^3.0.2",
     "mocha": "^6.2.0",
     "redux-asserts": "^0.0.12",
